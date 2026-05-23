@@ -418,9 +418,31 @@ p {
   line-height: 1.55;
 }
 
+.paper-authors,
+.paper-version {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
 .paper-links {
+  display: block;
   margin-top: 10px;
   margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.paper-links a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.paper-links a:hover,
+.paper-links a:focus {
+  text-decoration: underline;
 }
 
 .course-list {
