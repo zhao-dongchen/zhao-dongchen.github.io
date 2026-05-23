@@ -95,8 +95,9 @@ img {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--accent);
-  font-size: 0.68rem;
-  font-weight: 800;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.25rem;
+  font-weight: 400;
 }
 
 .site-nav {

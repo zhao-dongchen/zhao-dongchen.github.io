@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DZ">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Dongchen Zhao symbol">
   <rect width="64" height="64" fill="#fbfbfa"/>
   <rect x="8" y="8" width="48" height="48" fill="#ffffff" stroke="#d9dde3" stroke-width="2"/>
-  <text x="32" y="38" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#8a1538">DZ</text>
+  <text x="32" y="43" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="34" font-weight="400" fill="#2f7f9f">∂</text>
 </svg>

@@ -238,7 +238,7 @@ def render_html(data: dict, output: Path) -> None:
   <header class="site-header">
     <div class="container header-inner">
       <a class="site-title" href="../index.html">
-        <span class="site-mark" aria-hidden="true">DZ</span>
+        <span class="site-mark" aria-hidden="true">∂</span>
         <span>{escape(data['name'])}</span>
       </a>
       <nav class="site-nav" aria-label="Main navigation">
@@ -300,7 +300,7 @@ def render_landing_html(data: dict, output: Path) -> None:
   <header class="site-header">
     <div class="container header-inner">
       <a class="site-title" href="index.html">
-        <span class="site-mark" aria-hidden="true">DZ</span>
+        <span class="site-mark" aria-hidden="true">∂</span>
         <span>{escape(data['name'])}</span>
       </a>
       <nav class="site-nav" aria-label="Main navigation">
@@ -323,8 +323,7 @@ def render_landing_html(data: dict, output: Path) -> None:
         <a href="mailto:dongchen.zhao@uc.edu">Email</a>
         <a href="cv.html">CV</a>
         <a href="https://github.com/dczhaozach" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://twitter.com/DongchenZhao" target="_blank" rel="noopener">Twitter</a>
-        <a href="https://www.linkedin.com/in/dongchen-zhao-35b019162/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.linkedin.com/in/dongchen-zhao/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </aside>
 
