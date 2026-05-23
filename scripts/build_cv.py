@@ -232,7 +232,7 @@ def render_html(data: dict, output: Path) -> None:
   <meta name="description" content="Curriculum vitae for {escape(data['name'])}.">
   <title>CV | {escape(data['name'])}</title>
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../style.css?v=2">
+  <link rel="stylesheet" href="../style.css?v=3">
 </head>
 <body>
   <header class="site-header">
@@ -294,7 +294,7 @@ def render_landing_html(data: dict, output: Path) -> None:
   <meta name="description" content="Curriculum vitae for {escape(data['name'])}.">
   <title>CV | {escape(data['name'])}</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="site-header">
@@ -312,17 +312,34 @@ def render_landing_html(data: dict, output: Path) -> None:
     </div>
   </header>
 
-  <main class="container page">
-    <header class="page-header">
-      <h1>Curriculum Vitae</h1>
-      <p class="lead narrow">
-        A current PDF version of my curriculum vitae and a web version are available below.
-      </p>
-      <p class="button-row">
-        <a class="button" href="{pdf_href}"{pdf_attrs}><span aria-hidden="true">PDF</span>Download CV</a>
-        <a class="icon-link" href="cv/"><span aria-hidden="true">CV</span>View Web CV</a>
-      </p>
-    </header>
+  <main class="container site-layout page-layout">
+    <aside class="profile-card" aria-label="Profile">
+      <img class="profile-photo" src="assets/profile.jpg" alt="{escape(data['name'])}">
+      <h2>{escape(data['name'])}</h2>
+      <p class="profile-role">Assistant Professor of Economics</p>
+      <p class="profile-fields">Macroeconomics · Finance · Macro Labor</p>
+      <div class="profile-links" aria-label="Profile links">
+        <p>Follow</p>
+        <a href="mailto:dongchen.zhao@uc.edu">Email</a>
+        <a href="cv.html">CV</a>
+        <a href="https://github.com/dczhaozach" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://twitter.com/DongchenZhao" target="_blank" rel="noopener">Twitter</a>
+        <a href="https://www.linkedin.com/in/dongchen-zhao-35b019162/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </aside>
+
+    <div class="content-column">
+      <header class="page-header">
+        <h1>Curriculum Vitae</h1>
+        <p>
+          A current PDF version of my curriculum vitae and a web version are available below.
+        </p>
+        <p class="button-row">
+          <a class="button" href="{pdf_href}"{pdf_attrs}><span aria-hidden="true">PDF</span>Download CV</a>
+          <a class="icon-link" href="cv/"><span aria-hidden="true">CV</span>View Web CV</a>
+        </p>
+      </header>
+    </div>
   </main>
 
   <footer class="site-footer">
@@ -343,13 +360,18 @@ def main() -> int:
     parser.add_argument("--landing", type=Path, default=DEFAULT_LANDING)
     parser.add_argument("--pdf", type=Path, default=None)
     parser.add_argument("--dropbox-pdf", type=Path, default=None, help="Optional Dropbox-synced copy target.")
+    parser.add_argument(
+        "--build-pdf-from-data",
+        action="store_true",
+        help="Ignore source_pdf and rebuild the site PDF from cv/cv-data.json.",
+    )
     args = parser.parse_args()
 
     data = load_data(args.data)
     pdf_path = args.pdf or args.html.parent / data.get("pdf_filename", "dongchen-zhao-cv.pdf")
 
     source_pdf = data.get("source_pdf")
-    if source_pdf:
+    if source_pdf and not args.build_pdf_from_data:
         source_pdf_path = Path(source_pdf).expanduser()
         if not source_pdf_path.exists():
             raise FileNotFoundError(f"source_pdf does not exist: {source_pdf_path}")

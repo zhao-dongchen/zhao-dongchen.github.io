@@ -15,6 +15,7 @@ This is a static GitHub Pages academic personal website. Keep it build-free: pla
 - Treat `/Users/zhaode/Desktop/Documents/Academic/CV/cv_260210.pdf` as the controlling formatted PDF source when preserving CV layout.
 - Treat `cv/cv-data.json` as the structured website/PDF copy of that Word CV, not an independent source of truth.
 - Keep CV wording, section names, ordering, dates, and coauthor wording aligned with the source Word CV unless the user explicitly asks to revise the CV.
+- When new CV content must update the site PDF but no updated formatted PDF is provided, run `scripts/build_cv.py --build-pdf-from-data ...` so the PDF and static preview images are rebuilt from `cv/cv-data.json`.
 - Run `scripts/build_cv.py` after CV data or CV link changes so the same source regenerates:
   - `cv.html`
   - `cv/index.html`
