@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
+import subprocess
+import tempfile
 from html import escape
 from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
@@ -15,8 +18,6 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate
 
 
@@ -33,111 +34,194 @@ def load_data(path: Path) -> dict:
 
 
 def register_fonts() -> tuple[str, str]:
-    regular_candidates = [
-        Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
-        Path("/Library/Fonts/Arial.ttf"),
-        Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
-    ]
-    bold_candidates = [
-        Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
-        Path("/Library/Fonts/Arial Bold.ttf"),
-        Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
-    ]
-
-    regular = next((path for path in regular_candidates if path.exists()), None)
-    bold = next((path for path in bold_candidates if path.exists()), None)
-    if regular and bold:
-        pdfmetrics.registerFont(TTFont("CVSans", str(regular)))
-        pdfmetrics.registerFont(TTFont("CVSans-Bold", str(bold)))
-        return "CVSans", "CVSans-Bold"
-    return "Helvetica", "Helvetica-Bold"
+    return "Times-Roman", "Times-Bold"
 
 
 def paragraph_text(text: str) -> str:
     return xml_escape(text.replace("\u00a0", " ").strip())
 
 
+def format_inline(text: str, *, html: bool = False) -> str:
+    """Preserve the Word CV's italic coauthor notes in generated outputs."""
+    cleaned = text.replace("\u00a0", " ").strip()
+    escaped = escape(cleaned) if html else paragraph_text(cleaned)
+    open_tag, close_tag = ("<em>", "</em>") if html else ("<i>", "</i>")
+    if cleaned.startswith("* presented by coauthor"):
+        return f"{open_tag}{escaped}{close_tag}"
+    return re.sub(
+        r"(\((?:joint|Joint) with [^)]+\))",
+        lambda match: f"{open_tag}{match.group(1)}{close_tag}",
+        escaped,
+    )
+
+
+def item_kind(section_title: str, index: int, text: str) -> str:
+    if text.startswith("* presented by coauthor"):
+        return "note"
+    if section_title == "Education" and index in {0, 2}:
+        return "institution"
+    return "indent"
+
+
 def render_pdf(data: dict, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
-    font, font_bold = register_fonts()
+    font, _ = register_fonts()
     styles = getSampleStyleSheet()
 
     title = ParagraphStyle(
         "CVTitle",
         parent=styles["Title"],
-        fontName=font_bold,
-        fontSize=17.5,
-        leading=21,
+        fontName=font,
+        fontSize=12,
+        leading=14,
         alignment=TA_CENTER,
-        spaceAfter=8
+        spaceAfter=3
     )
     contact = ParagraphStyle(
         "CVContact",
         parent=styles["Normal"],
         fontName=font,
-        fontSize=8.8,
-        leading=11.2,
-        alignment=TA_CENTER,
-        spaceAfter=10
+        fontSize=14,
+        leading=16,
+        spaceAfter=3
     )
     section = ParagraphStyle(
         "CVSection",
         parent=styles["Heading2"],
-        fontName=font_bold,
-        fontSize=10.7,
-        leading=13,
-        textColor=colors.HexColor("#7d1f3f"),
-        spaceBefore=12,
-        spaceAfter=5
+        fontName=font,
+        fontSize=12,
+        leading=14,
+        textColor=colors.black,
+        spaceBefore=3,
+        spaceAfter=0
     )
-    item = ParagraphStyle(
+    item_indent = ParagraphStyle(
         "CVItem",
         parent=styles["Normal"],
         fontName=font,
-        fontSize=9.2,
-        leading=11.8,
-        spaceAfter=3.6
+        fontSize=14,
+        leading=16,
+        leftIndent=0.5 * inch,
+        spaceAfter=0
+    )
+    item_institution = ParagraphStyle(
+        "CVInstitution",
+        parent=item_indent,
+        fontSize=16,
+        leading=18,
+    )
+    item_note = ParagraphStyle(
+        "CVNote",
+        parent=styles["Normal"],
+        fontName=font,
+        fontSize=10,
+        leading=12,
+        firstLineIndent=0.5 * inch,
+        spaceAfter=0
     )
 
     story = [
         Paragraph(paragraph_text(data["name"]), title),
-        Paragraph("<br/>".join(paragraph_text(line) for line in data.get("contact", [])), contact),
-        HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#d9d4ca"), spaceAfter=8)
+        HRFlowable(width="100%", thickness=0.25, color=colors.HexColor("#a0a0a0"), spaceBefore=0, spaceAfter=5),
+        *[Paragraph(paragraph_text(line), contact) for line in data.get("contact", [])],
+        HRFlowable(width="100%", thickness=0.25, color=colors.HexColor("#a0a0a0"), spaceBefore=2, spaceAfter=1),
     ]
 
     for section_data in data.get("sections", []):
-        entries = [Paragraph(paragraph_text(entry), item) for entry in section_data.get("items", [])]
+        entries = []
+        for index, entry in enumerate(section_data.get("items", [])):
+            kind = item_kind(section_data["title"], index, entry)
+            style = {"institution": item_institution, "note": item_note}.get(kind, item_indent)
+            entries.append(Paragraph(format_inline(entry), style))
         story.append(KeepTogether([Paragraph(paragraph_text(section_data["title"]), section), *entries[:2]]))
         story.extend(entries[2:])
 
     doc = SimpleDocTemplate(
         str(output),
         pagesize=letter,
-        rightMargin=0.72 * inch,
-        leftMargin=0.72 * inch,
-        topMargin=0.62 * inch,
-        bottomMargin=0.62 * inch,
+        rightMargin=1 * inch,
+        leftMargin=1 * inch,
+        topMargin=1 * inch,
+        bottomMargin=1 * inch,
         title=f"{data['name']} CV",
         author=data["name"]
     )
     doc.build(story)
 
 
+def render_pdf_previews(pdf_path: Path, output_dir: Path) -> list[str]:
+    try:
+        from pypdf import PdfReader, PdfWriter
+    except ImportError:
+        return []
+
+    reader = PdfReader(str(pdf_path))
+    preview_names: list[str] = []
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    with tempfile.TemporaryDirectory(prefix="cv-pdf-preview-") as tmp_name:
+        tmp_dir = Path(tmp_name)
+        for index, page in enumerate(reader.pages, start=1):
+            page_pdf = tmp_dir / f"cv-page-{index}.pdf"
+            thumb_dir = tmp_dir / f"thumb-{index}"
+            thumb_dir.mkdir()
+
+            writer = PdfWriter()
+            writer.add_page(page)
+            with page_pdf.open("wb") as handle:
+                writer.write(handle)
+
+            subprocess.run(
+                ["qlmanage", "-t", "-s", "1600", "-o", str(thumb_dir), str(page_pdf)],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+
+            thumbnail = thumb_dir / f"{page_pdf.name}.png"
+            if not thumbnail.exists():
+                continue
+            target_name = f"cv-page-{index}.png"
+            shutil.copy2(thumbnail, output_dir / target_name)
+            preview_names.append(target_name)
+
+    for stale in output_dir.glob("cv-page-*.png"):
+        if stale.name not in preview_names:
+            stale.unlink()
+    return preview_names
+
+
 def render_html(data: dict, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     pdf_href = escape(data.get("pdf_url") or data.get("pdf_filename", "dongchen-zhao-cv.pdf"))
+    pdf_preview_href = escape(data.get("pdf_filename", "dongchen-zhao-cv.pdf"))
     pdf_attrs = ' target="_blank" rel="noopener"' if data.get("pdf_url") else ""
     section_html = []
     for section_data in data.get("sections", []):
-        items = "\n".join(f"            <li>{escape(item)}</li>" for item in section_data.get("items", []))
+        items = []
+        for index, item in enumerate(section_data.get("items", [])):
+            kind = item_kind(section_data["title"], index, item)
+            items.append(f'          <p class="cv-entry cv-entry-{kind}">{format_inline(item, html=True)}</p>')
         section_html.append(
             f"""        <section class="cv-section">
           <h2>{escape(section_data["title"])}</h2>
-          <ul>
-{items}
-          </ul>
+{chr(10).join(items)}
         </section>"""
         )
+
+    preview_images = data.get("_preview_images", [])
+    if preview_images:
+        preview_html = "\n".join(
+            f'      <img src="{escape(image)}" alt="{escape(data["name"])} CV page {index}">'
+            for index, image in enumerate(preview_images, start=1)
+        )
+        preview_html = f"""    <div class="cv-image-preview" aria-label="CV PDF preview">
+{preview_html}
+    </div>"""
+    else:
+        preview_html = f"""    <object class="cv-pdf-viewer" data="{pdf_preview_href}" type="application/pdf" aria-label="PDF preview of {escape(data['name'])}'s CV">
+      <p><a href="{pdf_preview_href}">Open the CV PDF</a></p>
+    </object>"""
 
     contact_html = "\n".join(f"          <p>{escape(line)}</p>" for line in data.get("contact", []))
     html = f"""<!DOCTYPE html>
@@ -166,21 +250,25 @@ def render_html(data: dict, output: Path) -> None:
     </div>
   </header>
 
-  <main class="container page">
-    <article class="cv-document">
+  <main class="container page cv-page">
+    <div class="cv-tools" aria-label="CV actions">
+      <a class="button" href="{pdf_href}"{pdf_attrs}><span aria-hidden="true">PDF</span>Download PDF</a>
+    </div>
+{preview_html}
+    <details class="cv-text-version">
+      <summary>Text version</summary>
+    <article class="cv-document cv-word">
       <header class="cv-heading">
-        <p class="eyebrow">{escape(data.get("role", "Curriculum Vitae"))}</p>
         <h1>{escape(data['name'])}</h1>
+        <div class="cv-rule" aria-hidden="true"></div>
         <div class="cv-contact">
 {contact_html}
         </div>
-        <p class="button-row">
-          <a class="button" href="{pdf_href}"{pdf_attrs}><span aria-hidden="true">PDF</span>Download PDF</a>
-        </p>
       </header>
 
 {chr(10).join(section_html)}
     </article>
+    </details>
   </main>
 
   <footer class="site-footer">
@@ -260,9 +348,19 @@ def main() -> int:
     data = load_data(args.data)
     pdf_path = args.pdf or args.html.parent / data.get("pdf_filename", "dongchen-zhao-cv.pdf")
 
+    source_pdf = data.get("source_pdf")
+    if source_pdf:
+        source_pdf_path = Path(source_pdf).expanduser()
+        if not source_pdf_path.exists():
+            raise FileNotFoundError(f"source_pdf does not exist: {source_pdf_path}")
+        pdf_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_pdf_path, pdf_path)
+    else:
+        render_pdf(data, pdf_path)
+
+    data["_preview_images"] = render_pdf_previews(pdf_path, args.html.parent)
     render_html(data, args.html)
     render_landing_html(data, args.landing)
-    render_pdf(data, pdf_path)
 
     if args.dropbox_pdf:
         args.dropbox_pdf.parent.mkdir(parents=True, exist_ok=True)

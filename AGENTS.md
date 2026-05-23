@@ -12,12 +12,13 @@ This is a static GitHub Pages academic personal website. Keep it build-free: pla
 
 - Use the `$update-academic-cv` skill for any CV update, CV link update, CV PDF refresh, Dropbox CV sync, or website CV content change.
 - Treat `/Users/zhaode/Desktop/Documents/Academic/CV/cv_260210.docx` as the controlling CV source unless the user provides a newer CV document.
+- Treat `/Users/zhaode/Desktop/Documents/Academic/CV/cv_260210.pdf` as the controlling formatted PDF source when preserving CV layout.
 - Treat `cv/cv-data.json` as the structured website/PDF copy of that Word CV, not an independent source of truth.
 - Keep CV wording, section names, ordering, dates, and coauthor wording aligned with the source Word CV unless the user explicitly asks to revise the CV.
 - Run `scripts/build_cv.py` after CV data or CV link changes so the same source regenerates:
   - `cv.html`
   - `cv/index.html`
-  - `cv/dongchen-zhao-cv.pdf`
+  - `cv/dongchen-zhao-cv.pdf` copied from the controlling formatted PDF when available
   - the optional Dropbox-synced PDF copy
 - Do not manually patch only one CV page when the change belongs in `cv/cv-data.json` or the generator.
 - `scripts/build_cv.py` uses `reportlab`. On this machine, run it with the bundled Codex Python runtime unless another Python environment already has `reportlab`.
