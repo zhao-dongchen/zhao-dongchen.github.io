@@ -11,7 +11,9 @@ This is a static GitHub Pages academic personal website. Keep it build-free: pla
 ## CV Workflow
 
 - Use the `$update-academic-cv` skill for any CV update, CV link update, CV PDF refresh, Dropbox CV sync, or website CV content change.
-- Treat `cv/cv-data.json` as the editable CV source.
+- Treat `/Users/zhaode/Desktop/Documents/Academic/CV/cv_260210.docx` as the controlling CV source unless the user provides a newer CV document.
+- Treat `cv/cv-data.json` as the structured website/PDF copy of that Word CV, not an independent source of truth.
+- Keep CV wording, section names, ordering, dates, and coauthor wording aligned with the source Word CV unless the user explicitly asks to revise the CV.
 - Run `scripts/build_cv.py` after CV data or CV link changes so the same source regenerates:
   - `cv.html`
   - `cv/index.html`
@@ -20,13 +22,9 @@ This is a static GitHub Pages academic personal website. Keep it build-free: pla
 - Do not manually patch only one CV page when the change belongs in `cv/cv-data.json` or the generator.
 - `scripts/build_cv.py` uses `reportlab`. On this machine, run it with the bundled Codex Python runtime unless another Python environment already has `reportlab`.
 
-## Mandatory Review
+## Fast CV Verification
 
-After every CV workflow update, run an independent read-only critical reviewer before final completion claims.
+Do not run an independent subagent/reviewer as part of the CV workflow.
 
-- Use the project `critical_reviewer` subagent when available.
-- If only generic subagents are available, spawn a read-only critical reviewer using the prompt in `/Users/zhaode/.codex/skills/update-academic-cv/references/critical-review-prompt.md`.
-- The reviewer must not be restricted by the scope, directions, file list, commands, or claims supplied by the main agent.
-- The reviewer must treat anything from the main agent as starting context only, never as an inspection boundary, and must independently decide how and where to evaluate within the user request, reviewer role, and read-only limits.
-- Fix blocker or major findings that are within the user-authorized work, then re-run verification.
-- If a subagent cannot be run, state that the mandatory review did not run and do not claim the CV update is fully complete.
+- Verify locally by running the generator, checking the generated PDF and Dropbox copy exist, checking `cv.html` and `cv/index.html` point to the expected CV URL, and previewing through the local HTTP server when visual layout changes.
+- If the user provides or references a Word CV, compare the generated CV content against that document with `textutil -convert txt -stdout`.

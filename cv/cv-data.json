@@ -1,6 +1,7 @@
 {
   "name": "Dongchen Zhao",
   "role": "Assistant Professor of Economics",
+  "source_docx": "/Users/zhaode/Desktop/Documents/Academic/CV/cv_260210.docx",
   "contact": [
     "Department of Economics",
     "University of Cincinnati Lindner College of Business",
@@ -13,7 +14,7 @@
     {
       "title": "Current Position",
       "items": [
-        "Assistant Professor of Economics, University of Cincinnati, 2024-present"
+        "Assistant Professor of Economics, University of Cincinnati, 2024 – present"
       ]
     },
     {
@@ -25,8 +26,10 @@
     {
       "title": "Education",
       "items": [
-        "University of Texas at Austin, Austin TX; Ph.D. in Economics, 2023",
-        "University of California, San Diego, La Jolla CA; B.S. in Mathematics and Economics, Summa Cum Laude, 2018"
+        "University of Texas at Austin, Austin TX",
+        "Ph.D. in Economics 2023",
+        "University of California, San Diego, La Jolla CA",
+        "B.S. in Mathematics and Economics, Summa Cum Laude, 2018"
       ]
     },
     {
@@ -42,7 +45,7 @@
       ]
     },
     {
-      "title": "References",
+      "title": "Reference",
       "items": [
         "Ayşegül Şahin, University of Texas at Austin",
         "Andreas I. Mueller, University of Texas at Austin",
@@ -53,17 +56,17 @@
       "title": "Working Papers",
       "items": [
         "\"A Structural Anatomy of Corporate Intangible Investments\" (joint with Ha Bui and Anushka Mitra)",
-        "\"Low Interest Rates, Debt Heterogeneity, and Firm Dynamics\"",
-        "\"Labor Market Outcomes and Welfare of Involuntary Part-Time Workers\"",
-        "\"The Effects of Regulation Restrictions on Firm Dynamism: Evidence from a Shift-Share Instrument\""
+        "“Low Interest Rates, Debt Heterogeneity, and Firm Dynamics”",
+        "“Labor Market Outcomes and Welfare of Involuntary Part-Time Workers”",
+        "“The Effects of Regulation Restrictions on Firm Dynamism: Evidence from a Shift-Share Instrument”"
       ]
     },
     {
       "title": "Work in Progress",
       "items": [
-        "\"Worker Reallocation in Internal and External Labor Markets\" (joint with Sadhika Bagga)",
-        "\"The Dynamics of Firms' Customer Base\" (joint with Ha Bui and Minseog Kim)",
-        "\"Idiosyncratic Expectations and Labor Market Outcomes\" (joint with Sadhika Bagga and Anushka Mitra)"
+        "\"Worker Reallocation in Internal and External Labor Markets\" (Joint with Sadhika Bagga)",
+        "\"The Dynamics of Firms’ Customer Base\"(joint with Ha Bui and Minseog Kim)",
+        "\"Idiosyncratic Expectations and Labor Market Outcomes\" (Joint with Sadhika Bagga and Anushka Mitra)"
       ]
     },
     {
@@ -82,13 +85,13 @@
         "Taft International Conference Travel Grant, University of Cincinnati, 2024",
         "Taft Domestic Conference Travel Grant, University of Cincinnati, 2024",
         "Professional Development Awards, University of Texas at Austin, 2021, 2022",
-        "Graduate School Fellowship, University of Texas at Austin, 2018-2023",
-        "Graduate School Supplement Fellowship, University of Texas at Austin, 2018-2023",
+        "Graduate School Fellowship, University of Texas at Austin,2018 – 2023",
+        "Graduate School Supplement Fellowship, University of Texas at Austin, 2018 – 2023",
         "Department Honor with Highest Distinction, University of California, San Diego, 2018"
       ]
     },
     {
-      "title": "Other",
+      "title": "Others",
       "items": [
         "Language: Mandarin (native), English (fluent)"
       ]
