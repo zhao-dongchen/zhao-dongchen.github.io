@@ -17,7 +17,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate
+from reportlab.platypus import HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,19 +66,19 @@ def render_pdf(data: dict, output: Path) -> None:
         "CVTitle",
         parent=styles["Title"],
         fontName=font_bold,
-        fontSize=17,
-        leading=20,
+        fontSize=17.5,
+        leading=21,
         alignment=TA_CENTER,
-        spaceAfter=6
+        spaceAfter=8
     )
     contact = ParagraphStyle(
         "CVContact",
         parent=styles["Normal"],
         fontName=font,
         fontSize=8.8,
-        leading=11,
+        leading=11.2,
         alignment=TA_CENTER,
-        spaceAfter=8
+        spaceAfter=10
     )
     section = ParagraphStyle(
         "CVSection",
@@ -86,29 +86,29 @@ def render_pdf(data: dict, output: Path) -> None:
         fontName=font_bold,
         fontSize=10.7,
         leading=13,
-        textColor=colors.HexColor("#171717"),
-        spaceBefore=7,
-        spaceAfter=3
+        textColor=colors.HexColor("#7d1f3f"),
+        spaceBefore=12,
+        spaceAfter=5
     )
     item = ParagraphStyle(
         "CVItem",
         parent=styles["Normal"],
         fontName=font,
         fontSize=9.2,
-        leading=11.5,
-        spaceAfter=2.8
+        leading=11.8,
+        spaceAfter=3.6
     )
 
     story = [
         Paragraph(paragraph_text(data["name"]), title),
         Paragraph("<br/>".join(paragraph_text(line) for line in data.get("contact", [])), contact),
-        HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#d9dde3"), spaceAfter=5)
+        HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#d9d4ca"), spaceAfter=8)
     ]
 
     for section_data in data.get("sections", []):
-        story.append(Paragraph(paragraph_text(section_data["title"]), section))
-        for entry in section_data.get("items", []):
-            story.append(Paragraph(paragraph_text(entry), item))
+        entries = [Paragraph(paragraph_text(entry), item) for entry in section_data.get("items", [])]
+        story.append(KeepTogether([Paragraph(paragraph_text(section_data["title"]), section), *entries[:2]]))
+        story.extend(entries[2:])
 
     doc = SimpleDocTemplate(
         str(output),
