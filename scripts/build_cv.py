@@ -232,7 +232,7 @@ def render_html(data: dict, output: Path) -> None:
   <meta name="description" content="Curriculum vitae for {escape(data['name'])}.">
   <title>CV | {escape(data['name'])}</title>
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../style.css?v=3">
+  <link rel="stylesheet" href="../style.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -294,7 +294,7 @@ def render_landing_html(data: dict, output: Path) -> None:
   <meta name="description" content="Curriculum vitae for {escape(data['name'])}.">
   <title>CV | {escape(data['name'])}</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -317,12 +317,11 @@ def render_landing_html(data: dict, output: Path) -> None:
       <img class="profile-photo" src="assets/profile.jpg" alt="{escape(data['name'])}">
       <h2>{escape(data['name'])}</h2>
       <p class="profile-role">Assistant Professor of Economics</p>
-      <p class="profile-fields">Macroeconomics · Finance · Macro Labor</p>
+      <p class="profile-fields"><span>Macroeconomics</span><span>Finance</span><span>Macro Labor</span></p>
       <div class="profile-links" aria-label="Profile links">
         <p>Follow</p>
         <a href="mailto:dongchen.zhao@uc.edu">Email</a>
         <a href="cv.html">CV</a>
-        <a href="https://github.com/dczhaozach" target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.linkedin.com/in/dongchen-zhao/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </aside>
