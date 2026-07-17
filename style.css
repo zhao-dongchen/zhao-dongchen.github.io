@@ -173,6 +173,10 @@ img {
   color: var(--text);
 }
 
+.profile-fields span {
+  display: block;
+}
+
 .profile-links {
   margin-top: 22px;
   padding-top: 16px;
